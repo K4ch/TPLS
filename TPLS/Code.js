@@ -1,11 +1,12 @@
 
 //let node = document.querySelectorAll("td");
 
-let PalavrasF = ["React", "HTML", "CSS", "Python"] 
-let PalavrasN = ["React", "Variavel", "Funcao", "Python", "Java", "String", "Script"]
-let PalavrasD = ["JavaScript", "Variavel", "String", "Python", "Programar", ""]
+let PalavrasF = ["REACT", "HTML", "CSS", "PYTHON"] 
+let PalavrasN = ["REACT", "VARIAVEL", "FUNCAO", "PYTHON", "JAVA", "STRING", "SCRIPT"]
+let PalavrasD = ["JAVASCRIPT", "VARIAVEL", "STRING", "PYTHON", "PROGRAMAR"]
 
 window.onload = function Preparar() {
+    tableCreate();
     let taken = [];
     for(let p of document.querySelectorAll("p")){
         if(taken.length === 4){
@@ -18,7 +19,8 @@ window.onload = function Preparar() {
         taken.push(PalavrasN[n]);
         p.textContent = PalavrasN[n];
     }
-    oFabioéGay(taken);
+    console.log(taken);
+    displayWords(taken);
     for (let node of document.querySelectorAll("td")) {
         node.onclick = function Clicar(){
             if(node.className == ""){
@@ -28,7 +30,6 @@ window.onload = function Preparar() {
                 node.className = ""
             }
         }
-
         if (node.textContent !== "") {
             continue;
         }
@@ -37,21 +38,27 @@ window.onload = function Preparar() {
     }
 }
 
-function oFabioéGay(taken) {
+function displayWords(taken) {
     let i = 0;
     while(i !== taken.length){
         let random =  1;//Math.floor(Math.random() * 5) + 1;
-        let startRow = Math.floor(Math.random() * 8)  + 1;
+        let startRow =  Math.floor(Math.random() * 8)  + 1;
         let startCol =  Math.floor(Math.random() * 8) + 1;
         if(random === 1){ //Horizontal ->
             if((taken[i].length + startCol) > 9){
                 continue;
             }
-            for(let node of document.querySelectorAll("td")){
-                for(let j = 0; j < taken[i].length; j++){
-                    let pos = (startRow * 10) + startCol;
-                    node.className(pos).textContent = taken[i].charAt(j);
+            let end = false;
+            let j = 0;
+            while (!end) {
+                if (j >= taken[i].length) {
+                    end = true;
+                    break;
                 }
+                console.log(taken[i].charAt(j));
+                document.getElementById(`cell${startRow}${j}`).innerHTML = taken[i].charAt(j);
+                j++;
+                startCol++;
             }
             i++;
         }/*else if(random === 2){ //Horizontal <-
@@ -68,4 +75,17 @@ function oFabioéGay(taken) {
     }
 }
 
+function tableCreate() {
+    let container = document.getElementById('tableContainer');
+    let tbl = document.createElement('table');
 
+    for (let i = 0; i < 9; i++) {
+        let tr = tbl.insertRow();
+        for (let j = 0; j < 9; j++) {
+            let td = tr.insertCell();
+            td.appendChild(document.createTextNode('X'));
+            td.setAttribute('id', `cell${i}${j}`);
+        }
+    }
+    container.appendChild(tbl);
+}
