@@ -6,7 +6,18 @@ let PalavrasN = ["REACT", "VARIAVEL", "FUNCAO", "PYTHON", "JAVA", "STRING", "SCR
 let PalavrasD = ["JAVASCRIPT", "VARIAVEL", "STRING", "PYTHON", "PROGRAMAR"]
 
 window.onload = function Preparar() {
-    tableCreate();
+    let container = document.getElementById('Contentor');
+    let tbl = document.createElement('table');
+
+    for (let i = 0; i < 9; i++) {
+        let tr = tbl.insertRow();
+        for (let j = 0; j < 9; j++) {
+            let td = tr.insertCell();
+            td.appendChild(document.createTextNode('X'));
+            td.setAttribute('id', `cell${i}${j}`);
+        }
+    }
+    container.appendChild(tbl); 
     let taken = [];
     for(let p of document.querySelectorAll("p")){
         if(taken.length === 4){
@@ -33,59 +44,127 @@ window.onload = function Preparar() {
         if (node.textContent !== "") {
             continue;
         }
-        let charCode = Math.round(65 + Math.random() * 25);
-        node.textContent = String.fromCharCode(charCode);
+        //let charCode = Math.round(65 + Math.random() * 25);
+        //node.textContent = String.fromCharCode(charCode);
     }
 }
 
 function displayWords(taken) {
     let i = 0;
-    while(i !== taken.length){
-        let random =  1;//Math.floor(Math.random() * 5) + 1;
-        let startRow =  Math.floor(Math.random() * 8)  + 1;
-        let startCol =  Math.floor(Math.random() * 8) + 1;
+    ciclo1: while(i !== taken.length){
+        let random = Math.floor(Math.random() * 5) + 1;
+        let startRow = Math.floor(Math.random() * 9);
+        let startCol = Math.floor(Math.random() * 9);
+        let testRow = startRow;
+        let testCol = startCol;
         if(random === 1){ //Horizontal ->
-            if((taken[i].length + startCol) > 9){
+            if((taken[i].length + startCol) > 8){
                 continue;
+            }
+            for(let k = 0; k < taken[i].length; k++){
+                if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                    console.log("Ganda Burro");
+                    continue ciclo1;
+                }
+                testCol++;
             }
             let end = false;
             let j = 0;
             while (!end) {
                 if (j >= taken[i].length) {
                     end = true;
-                    break;
+                    continue;
                 }
                 console.log(taken[i].charAt(j));
-                document.getElementById(`cell${startRow}${j}`).innerHTML = taken[i].charAt(j);
+                document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                 j++;
                 startCol++;
             }
+            i++;   
+        }else if(random === 2){ //Horizontal <-
+            if((startCol - taken[i].length) < 0){
+                continue;
+            }
+            for(let k = 0; k < taken[i].length; k++){
+                if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                    console.log("Ganda Burro");
+                    continue ciclo1;
+                }
+                testCol--;
+            }
+            let end = false;
+            let j = 0;
+            while (!end) {
+                if (j >= taken[i].length) {
+                    end = true;
+                    continue;
+                }
+                console.log(taken[i].charAt(j));
+                document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                j++;
+                startCol--;
+            }
             i++;
-        }/*else if(random === 2){ //Horizontal <-
 
+            
         }else if(random === 3){ //Vertical ->
-
+            if((taken[i].length + startRow) > 8){
+                continue;
+            }
+            for(let k = 0; k < taken[i].length; k++){
+                if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                    console.log("Ganda Burro");
+                    continue ciclo1;
+                }
+                testRow++;
+            }
+            let end = false;
+            let j = 0;
+            while (!end) {
+                if (j >= taken[i].length) {
+                    end = true;
+                    continue;
+                }
+                console.log(taken[i].charAt(j));
+                document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                j++;
+                startRow++;
+            }
+            i++;
+               
         }else if(random === 4){ //Vertical <-
-
+            if((startRow - taken[i].length) < 0){
+                continue;
+            }
+            for(let k = 0; k < taken[i].length; k++){
+                if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                    console.log("Ganda Burro");
+                    continue ciclo1;
+                }
+                testRow--;
+            }
+            let end = false;
+            let j = 0;
+            while (!end) {
+                if (j >= taken[i].length) {
+                    end = true;
+                    continue;
+                }
+                console.log(taken[i].charAt(j));
+                document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                j++;
+                startRow--;
+            }
+            i++;
+                /*
         }else if(random === 5){ //Diagonal ->
 
         }else{ //Diagonal <-
-            
-        }*/
-    }
-}
-
-function tableCreate() {
-    let container = document.getElementById('tableContainer');
-    let tbl = document.createElement('table');
-
-    for (let i = 0; i < 9; i++) {
-        let tr = tbl.insertRow();
-        for (let j = 0; j < 9; j++) {
-            let td = tr.insertCell();
-            td.appendChild(document.createTextNode('X'));
-            td.setAttribute('id', `cell${i}${j}`);
+         */   
         }
     }
-    container.appendChild(tbl);
 }
