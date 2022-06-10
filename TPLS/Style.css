@@ -37,9 +37,8 @@ td.Selecionado {
     grid-template-columns: 400px 100px;
     grid-template-rows: 400px;
     width: 1000px;
-    height:650px;
+    height: 650px;
     margin: 0px auto;
-    border: red;
 }
 
 #Palavras{
@@ -58,7 +57,7 @@ td.Selecionado {
     border-style:double;
 }
 
-.botaoDrop {
+.oBotao {
     background-color: #3498DB;
     color: white;
     padding: 16px;
@@ -86,7 +85,7 @@ td.Selecionado {
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
-}
+  }
 
 .dropdown-content a {
     color: black;
