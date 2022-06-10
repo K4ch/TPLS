@@ -1,17 +1,16 @@
-
 //let node = document.querySelectorAll("td");
 
-let PalavrasF = ["REACT", "HTML", "CSS", "PYTHON", "JAVA"] 
+let PalavrasF = ["REACT", "HTML", "CSS", "LS", "JAVA"] 
 let PalavrasN = ["REACT", "VARIAVEL", "FUNCAO", "PYTHON", "JAVA", "STRING"]
 let PalavrasD = ["JAVASCRIPT", "VARIAVEL", "STRING", "PYTHON", "PROGRAMAR"]
 
 function myFunction() {
-    document.getElementById("oBotao").classList.toggle("show");
+    document.getElementById("botaoDrop").classList.toggle("show");
 }
 
 window.onclick = function(event) {
     
-    if (!event.target.matches('.botaoDrop')) {
+    if (!event.target.matches('.oBotao')) {
       var dropdowns = document.getElementsByClassName("dropdown-content");
       var i;
       for (i = 0; i < dropdowns.length; i++) {
@@ -23,14 +22,16 @@ window.onclick = function(event) {
     }
 }
 
-window.onload = function Preparar(tipo) {
+window.onload = function Preparar() {
+//window.onload = function Preparar(tipo) {
     
+    let tipo = 0;
     let container = document.getElementById('Contentor');
     let tbl = document.createElement('table');
     let taken = [];
     
     switch(tipo){
-        case 0: {
+        case 0:
             for (let i = 0; i < 6; i++) {
                 let tr = tbl.insertRow();
                 for (let j = 0; j < 6; j++) {
@@ -42,19 +43,19 @@ window.onload = function Preparar(tipo) {
             container.appendChild(tbl); 
 
             for(let p of document.querySelectorAll("p")){
-                if(taken.length === 3){
+                if(taken.length === 2){
                     break;
                 }
                 let n = Math.floor(Math.random() * 5);
                 while(taken.includes(PalavrasN[n])){
                     n = Math.floor(Math.random() * 5);
                 }
-                taken.push(PalavrasN[n]);
-                p.textContent = PalavrasN[n];
+                taken.push(PalavrasF[n]);
+                p.textContent = PalavrasF[n];
             } 
-        };
+            break
 
-        case 1: {
+        case 1: 
             for (let i = 0; i < 9; i++) {
                 let tr = tbl.insertRow();
                 for (let j = 0; j < 9; j++) {
@@ -76,11 +77,32 @@ window.onload = function Preparar(tipo) {
                 taken.push(PalavrasN[n]);
                 p.textContent = PalavrasN[n];
             }
-        };
+            break;
 
-        case 2:{
+        case 2: 
+            for (let i = 0; i < 12; i++) {
+                let tr = tbl.insertRow();
+                for (let j = 0; j < 12; j++) {
+                    let td = tr.insertCell();
+                        td.appendChild(document.createTextNode('X'));
+                    td.setAttribute('id', `cell${i}${j}`);
+                }
+            }
+            container.appendChild(tbl); 
 
-        };
+            for(let p of document.querySelectorAll("p")){
+                if(taken.length === 5){
+                    break;
+                }
+                let n = Math.floor(Math.random() * 5);
+                while(taken.includes(PalavrasD[n])){
+                    n = Math.floor(Math.random() * 5);
+                }
+                taken.push(PalavrasD[n]);
+                p.textContent = PalavrasD[n];
+            }
+            break;
+        
 
         default: break;
     }
@@ -104,25 +126,117 @@ window.onload = function Preparar(tipo) {
     }
 }
 
-function displayWords(taken, tipo) {
+function displayWords(taken) {
     
+    let tipo = 0;
     let i = 0;
-    
+    let random = 0;
+    let startRow = 0;
+    let startCol = 0;
+    let testRow = 0;
+    let testCol = 0;
+
     ciclo1: while(i !== taken.length){
         
         switch(tipo){
 
-            case 0:{
+            case 0:
                 
-            }
-
-            case 1:{
+                random = Math.floor(Math.random() * 2) + 1;
+                startRow = Math.floor(Math.random() * 6);
+                startCol = Math.floor(Math.random() * 6);
+                testRow = startRow;
+                testCol = startCol;
+                    
+                if(random === 1){ //Horizontal ->
+                    if((taken[i].length + startCol) > 5){
+                        continue;
+                   }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testCol++;
+                    }
+                    
+                    let end = false;
+                    let j = 0;
+                    
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startCol++;
+                    }
+                    i++;
+                    
+                }else if(random === 2){ //Vertical ->
+                    if((taken[i].length + startRow) > 5){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testRow++;
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startRow++;
+                    }
+                    i++;
+                        
+                }else { //Diagonal \ v
+                    if((taken[i].length + startCol) > 5 || (taken[i].length + startRow) > 5){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testRow++;
+                        testCol++;                
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startRow++;
+                        startCol++;
+                    }
+                    i++;
+                }
+                break;
+            
+            case 1:
                 
-                let random = Math.floor(Math.random() * 8) + 1;
-                let startRow = Math.floor(Math.random() * 9);
-                let startCol = Math.floor(Math.random() * 9);
-                let testRow = startRow;
-                let testCol = startCol;
+                random = Math.floor(Math.random() * 8) + 1;
+                startRow = Math.floor(Math.random() * 9);
+                startCol = Math.floor(Math.random() * 9);
+                testRow = startRow;
+                testCol = startCol;
                     
                 if(random === 1){ //Horizontal ->
                     if((taken[i].length + startCol) > 8){
@@ -333,8 +447,7 @@ function displayWords(taken, tipo) {
                     }
                     i++;
                 }
-            }
-            
+                break;
         }
         
     }
