@@ -1,5 +1,3 @@
-//let node = document.querySelectorAll("td");
-
 let PalavrasF = ["REACT", "HTML", "CSS", "LS", "JAVA"] 
 let PalavrasN = ["REACT", "VARIAVEL", "FUNCAO", "PYTHON", "JAVA", "STRING"]
 let PalavrasD = ["JAVASCRIPT", "VARIAVEL", "STRING", "PYTHON", "PROGRAMAR"]
@@ -11,10 +9,10 @@ function myFunction() {
 window.onclick = function(event) {
     
     if (!event.target.matches('.oBotao')) {
-      var dropdowns = document.getElementsByClassName("dropdown-content");
-      var i;
+      let dropdowns = document.getElementsByClassName("dropdown-content");
+      let i;
       for (i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
+        let openDropdown = dropdowns[i];
         if (openDropdown.classList.contains('show')) {
           openDropdown.classList.remove('show');
         }
@@ -22,13 +20,24 @@ window.onclick = function(event) {
     }
 }
 
-window.onload = function Preparar() {
-//window.onload = function Preparar(tipo) {
+function update(nCorreta, nErrada){
+    document.getElementById('Certas').innerHTML = `Palavras Certas: ${nCorreta}`;
+    document.getElementById('Erradas').innerHTML = `Palavras Erradas: ${nErrada}`;
+}
+
+function Preparar(tipo) {
     
-    let tipo = 0;
+    if(tipo == 0 || tipo == 1 || tipo == 2 ){
+        document.getElementById('botaoDisplay').classList.add('display');
+        document.getElementById('Palavras').classList.remove('display');
+        document.getElementById('Pontuacao').classList.remove('display');
+    }
     let container = document.getElementById('Contentor');
     let tbl = document.createElement('table');
     let taken = [];
+    let nCorreta = 0;
+    let nErrada = 0;
+    update(nCorreta, nErrada);
     
     switch(tipo){
         case 0:
@@ -109,13 +118,41 @@ window.onload = function Preparar() {
     
     console.log(taken);
     displayWords(taken, tipo);
+    let array = [];
+    let startCell, endCell, SstartCell, SendCell;
+    let startRow, startCol, endRow, endCol;
     for (let node of document.querySelectorAll("td")) {
-        node.onclick = function Clicar(){
+        node.onclick = function cliqueitings(){
             if(node.className == ""){
                 node.className = "Selecionado"
-            }
-            else {
-                node.className = ""
+                if(startCell === undefined){ 
+                    startCell = node.id;
+                    SstartCell = String(startCell);
+                    startCell = SstartCell.split("cell")[1];
+                    startRow = Math.floor(startCell/10);
+                    startCol = startCell%10;
+                }else if(endCell === undefined){
+                    endCell = node.id;
+                    SendCell = String(endCell);
+                    endCell = SendCell.split("cell")[1];
+                    endRow = Math.floor(endCell/10);
+                    endCol = endCell%10;
+                    array = generatingsthecorrectagins(startRow, startCol, endRow, endCol); 
+                    console.log(array);
+                    if(taken.includes(array[1])){
+                        console.log("ENTREI");
+                        mudatingcoloratings(startRow, startCol, array, true);
+                        nCorreta++;
+                        update(nCorreta, nErrada);
+                    }
+                    else{
+                        mudatingcoloratings(startRow, startCol, array, false);
+                        nErrada++;
+                        update(nCorreta, nErrada);
+                    }
+                    startCell = undefined;
+                    endCell = undefined;
+                }
             }
         }
         if (node.textContent !== 'X') {
@@ -126,9 +163,9 @@ window.onload = function Preparar() {
     }
 }
 
-function displayWords(taken) {
+function displayWords(taken, tipo) {
     
-    let tipo = 0;
+    //let tipo = 1;
     let i = 0;
     let random = 0;
     let startRow = 0;
@@ -231,7 +268,6 @@ function displayWords(taken) {
                 break;
             
             case 1:
-                
                 random = Math.floor(Math.random() * 8) + 1;
                 startRow = Math.floor(Math.random() * 9);
                 startCol = Math.floor(Math.random() * 9);
@@ -448,7 +484,510 @@ function displayWords(taken) {
                     i++;
                 }
                 break;
+                
+                case 2:
+                
+                random = Math.floor(Math.random() * 11) + 1;
+                startRow = Math.floor(Math.random() * 12);
+                startCol = Math.floor(Math.random() * 12);
+                testRow = startRow;
+                testCol = startCol;
+                    
+                if(random === 1){ //Horizontal ->
+                    if((taken[i].length + startCol) > 11){
+                        continue;
+                   }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testCol++;
+                    }
+                    
+                    let end = false;
+                    let j = 0;
+                    
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startCol++;
+                    }
+                    i++;
+                }else if(random === 2){ //Horizontal <-
+                    if((startCol - taken[i].length) < 0){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testCol--;
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startCol--;
+                    }
+                    i++;
+
+                    
+                }else if(random === 3){ //Vertical ->
+                    if((taken[i].length + startRow) > 11){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testRow++;
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startRow++;
+                    }
+                    i++;
+                    
+                }else if(random === 4){ //Vertical <-
+                    if((startRow - taken[i].length) < 0){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testRow--;
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startRow--;
+                    }
+                    i++;
+                        
+                }else if(random === 5){ //Diagonal \ v
+                    if((taken[i].length + startCol) > 11 || (taken[i].length + startRow) > 11){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testRow++;
+                        testCol++;                
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startRow++;
+                        startCol++;
+                    }
+                    i++;
+                }else if(random === 6){ //Diagonal \ ^
+                    if((startCol - taken[i].length) < 0 || (startRow - taken[i].length) < 0){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testRow--;
+                        testCol--;                
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startRow--;
+                        startCol--;
+                    }
+                    i++;
+                }else if(random === 7){ //Diagonal / ^
+                    if((taken[i].length + startCol) > 11 || (startRow - taken[i].length) < 0){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testRow--;
+                        testCol++;                
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startRow--;
+                        startCol++;
+                    }
+                    i++;
+                }else{ //
+                    if((taken[i].length + startRow) > 11 || (startCol - taken[i].length) < 0){
+                        continue;
+                    }
+                    for(let k = 0; k < taken[i].length; k++){
+                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                            continue ciclo1;
+                        }
+                        testRow++;
+                        testCol--;                
+                    }
+                    let end = false;
+                    let j = 0;
+                    while (!end) {
+                        if (j >= taken[i].length) {
+                            end = true;
+                            continue;
+                        }
+                        console.log(taken[i].charAt(j));
+                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
+                        j++;
+                        startRow++;
+                        startCol--;
+                    }
+                    i++;
+                }
+                break;
         }
         
     }
 }
+
+function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
+    let diff;
+    let palavra;
+    let x = 1;
+    if(startRow === endRow){
+        if(startCol > endCol){
+            diff = startCol - endCol;
+            palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+            for(i = diff; i > 0; i--){
+                if(document.getElementById(`cell${startRow}${startCol-x}`).className === "plvCorreta"){
+                    palavra += document.getElementById(`cell${startRow}${startCol-x}`).textContent;
+                    x++;
+                    continue;
+                }
+                palavra += document.getElementById(`cell${startRow}${startCol-x}`).textContent;
+                document.getElementById(`cell${startRow}${startCol-x}`).className = "Selecionado"
+                x++;
+            }
+            console.log(palavra);
+            return [2, palavra];
+        }else if(startCol < endCol){
+            diff = endCol - startCol;
+            palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+            for(i = diff; i > 0; i--){
+                if(document.getElementById(`cell${startRow}${startCol+x}`).className === "plvCorreta"){
+                    palavra += document.getElementById(`cell${startRow}${startCol+x}`).textContent;
+                    x++;
+                    continue;
+                }
+                palavra += document.getElementById(`cell${startRow}${startCol+x}`).textContent;
+                document.getElementById(`cell${startRow}${startCol+x}`).className = "Selecionado"
+                x++;
+            }
+            console.log(palavra);
+            return [1, palavra];
+        }  
+    }else if(startCol === endCol){
+        if(startRow < endRow){
+            diff = endRow - startRow;
+            palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+            for(i = diff; i > 0; i--){
+                if(document.getElementById(`cell${startRow+x}${startCol}`).className === "plvCorreta"){
+                    palavra += document.getElementById(`cell${startRow+x}${startCol}`).textContent;
+                    x++;
+                    continue;
+                }
+                palavra += document.getElementById(`cell${startRow+x}${startCol}`).textContent;
+                document.getElementById(`cell${startRow+x}${startCol}`).className = "Selecionado"
+                x++;
+            }
+            console.log(palavra);
+            return [3, palavra];
+        }else if(startRow > endRow){
+            diff = startRow - endRow;
+            palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+            for(i = diff; i > 0; i--){
+                if(document.getElementById(`cell${startRow-x}${startCol}`).className === "plvCorreta"){
+                    palavra += document.getElementById(`cell${startRow-x}${startCol}`).textContent;
+                    x++;
+                    continue;
+                }
+                palavra += document.getElementById(`cell${startRow-x}${startCol}`).textContent;
+                document.getElementById(`cell${startRow-x}${startCol}`).className = "Selecionado"
+                x++;
+            }
+            console.log(palavra);
+            return [4, palavra];
+        }
+    }else{
+        if(startCol > endCol){
+            if(startRow < endRow){
+                if((startCol-endCol) === (endRow-startRow)){
+                    diff = startCol - endCol;
+                    palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+                    for(i = diff; i > 0; i--){
+                        if(document.getElementById(`cell${startRow+x}${startCol-x}`).className === "plvCorreta"){
+                            palavra += document.getElementById(`cell${startRow+x}${startCol-x}`).textContent;
+                            x++;
+                            continue;
+                        }
+                        palavra += document.getElementById(`cell${startRow+x}${startCol-x}`).textContent;
+                        document.getElementById(`cell${startRow+x}${startCol-x}`).className = "Selecionado"
+                        x++;
+                    }
+                    console.log(palavra);
+                    return [8, palavra];
+                }
+            }else if(startRow > endRow){
+                if((startCol-endCol) === (startRow-endRow)){
+                    diff = startCol - endCol;
+                    palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+                    for(i = diff; i > 0; i--){
+                        if(document.getElementById(`cell${startRow-x}${startCol-x}`).className === "plvCorreta"){
+                            palavra += document.getElementById(`cell${startRow-x}${startCol-x}`).textContent;
+                            x++;
+                            continue;
+                        }
+                        palavra += document.getElementById(`cell${startRow-x}${startCol-x}`).textContent;
+                        document.getElementById(`cell${startRow-x}${startCol-x}`).className = "Selecionado"
+                        x++;
+                    }
+                    console.log(palavra);
+                    return [6, palavra];
+                }
+            }
+        }else if(startCol < endCol){
+            if(startRow < endRow){
+                if((endCol-startCol) === (endRow-startRow)){
+                    diff = endCol - startCol;
+                    palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+                    for(i = diff; i > 0; i--){
+                        if(document.getElementById(`cell${startRow+x}${startCol+x}`).className === "plvCorreta"){
+                            palavra += document.getElementById(`cell${startRow+x}${startCol+x}`).textContent;
+                            x++;
+                            continue;
+                        }
+                        palavra += document.getElementById(`cell${startRow+x}${startCol+x}`).textContent;
+                        document.getElementById(`cell${startRow+x}${startCol+x}`).className = "Selecionado"
+                        x++;
+                    }
+                    console.log(palavra);
+                    return [5, palavra];
+                }
+            }else if(startRow > endRow){
+                if((endCol-startCol) === (startRow-endRow)){
+                    diff = startCol - endCol;
+                    palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+                    for(i = diff; i > 0; i--){
+                        if(document.getElementById(`cell${startRow-x}${startCol+x}`).className === "plvCorreta"){
+                            palavra += document.getElementById(`cell${startRow-x}${startCol+x}`).textContent;
+                            x++;
+                            continue;
+                        }
+                        palavra += document.getElementById(`cell${startRow-x}${startCol+x}`).textContent;
+                        document.getElementById(`cell${startRow-x}${startCol+x}`).className = "Selecionado"
+                        x++;
+                    }
+                    console.log(palavra);
+                    return [7, palavra];
+                }
+            }
+        }
+    }
+}
+
+function mudatingcoloratings(startRow, startCol, array, contem){
+    let posicao = array[0];
+    let palavra = array[1];
+    switch(posicao){
+        case 1: {
+            for(let i = palavra.length-1; i >= 0;i--){
+                if(contem === true){
+                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    startCol++;
+                }else{
+                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                        startCol++;
+                        continue;
+                    }
+                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    startCol++;
+                }
+            }
+        }break;
+        case 2: {
+            for(let i = palavra.length-1; i >= 0;i--){
+                if(contem === true){
+                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    startCol--;
+                }else{
+                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                        startCol--;
+                        continue;
+                    }
+                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    startCol--;
+                }
+            }
+        }break;
+        case 3: {
+            for(let i = palavra.length-1; i >= 0;i--){
+                if(contem === true){
+                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    startRow++;
+                }else{
+                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                        startRow++;
+                        continue;
+                    }
+                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    startRow++;
+                }
+            }
+        }break;
+        case 4: {
+            for(let i = palavra.length-1; i >= 0;i--){
+                if(contem === true){
+                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    startRow--;
+                }else{
+                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                        startRow--;
+                        continue;
+                    }
+                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    startRow--;
+                }
+            }
+        }break;
+        case 5: {
+            for(let i = palavra.length-1; i >= 0;i--){
+                if(contem === true){
+                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    startRow++;
+                    startCol++;
+                }else{
+                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                        startRow++;
+                        startCol++;
+                        continue;
+                    }
+                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    startRow++;
+                    startCol++;
+                }
+            }
+        }break;
+        case 6: {
+            for(let i = palavra.length-1; i >= 0;i--){
+                if(contem === true){
+                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    startRow--;
+                    startCol--;
+                }else{
+                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                        startRow--;
+                        startCol--;
+                        continue;
+                    }
+                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    startRow--;
+                    startCol--;
+                }
+            }
+        }break;
+        case 7: {
+            for(let i = palavra.length-1; i >= 0;i--){
+                if(contem === true){
+                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    startRow--;
+                    startCol++;
+                }else{
+                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                        startRow--;
+                        startCol++;
+                        continue;
+                    }
+                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    startRow--;
+                    startCol++;
+                }
+            }
+        }break;
+        case 8: {
+            for(let i = palavra.length-1; i >= 0;i--){
+                if(contem === true){
+                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    startRow++;
+                    startCol--;
+                }else{
+                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                        startRow++;
+                        startCol--;
+                        continue;
+                    }
+                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    startRow++;
+                    startCol--;
+                }
+            }
+        }break;
+    }
+}
+

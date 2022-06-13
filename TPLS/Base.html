@@ -9,19 +9,25 @@
     <body>
         <h1>Sopa de Letras - Linguagens Script</h1>
         <div class="botao">
-            <button onclick="myFunction()" class="oBotao">Dificuldade</button>
-            <div id="botaoDrop" class="dropdown-content">
-              <button onclick="Preparar(0)">Facil</button>
-              <button onclick="Preparar(1)">Medio</button>
-              <button onclick="Preparar(2)">Dificil</button>
+            <div id="botaoDisplay">   
+                <button onclick="myFunction()" class="oBotao">Dificuldade</button>
+                <div id="botaoDrop" class="dropdown-content">
+                <button onclick="Preparar(0)">Facil</button>
+                <button onclick="Preparar(1)">Medio</button>
+                <button onclick="Preparar(2)">Dificil</button>
+                </div>
             </div>
         </div>
         <div id="Contentor">
-            <div id="Palavras">
+            <div id="Palavras"  class="display">
                 <p></p>
                 <p></p>
                 <p></p>
                 <p></p>
+            </div>
+            <div id="Pontuacao" class="display">
+                <h2 id="Certas"></h2>
+                <h2 id="Erradas"></h2>
             </div>
         </div>
     </body>
