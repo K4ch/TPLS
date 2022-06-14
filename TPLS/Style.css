@@ -40,6 +40,20 @@ td.plvErrada{
     background: red;
 }
 
+.risca{
+    text-decoration: line-through;
+}
+
+#timer{
+    text-align: center;
+    font-size: xx-large;
+    margin-bottom: 50px;
+    margin-left: 690px;
+    margin-right: 690px;
+    border-radius: 20px;
+    background-color: rgb(155, 59, 3);
+}
+
 #Contentor{
     display: grid;
     grid-template-columns: 400px 100px;
@@ -61,7 +75,7 @@ td.plvErrada{
     font-size: 30px;
     background-color: rgb(255, 165, 80);
     border-width: 3px;
-    border-color: rgb(0, 0, 0);
+    border-color: rgba(28, 177, 164, 0.836);
     border-style:double;
 }
 
@@ -94,8 +108,6 @@ td.plvErrada{
     position: relative;
     display: inline-block;
     margin-left: 650px;
-    margin-bottom: 100px;
-    
 }
   
 

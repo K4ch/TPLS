@@ -2,6 +2,9 @@ let PalavrasF = ["REACT", "HTML", "CSS", "LS", "JAVA"]
 let PalavrasN = ["REACT", "VARIAVEL", "FUNCAO", "PYTHON", "JAVA", "STRING"]
 let PalavrasD = ["JAVASCRIPT", "VARIAVEL", "STRING", "PYTHON", "PROGRAMAR"]
 
+const startingMinutes = 3;
+let time = startingMinutes * 60;
+
 function myFunction() {
     document.getElementById("botaoDrop").classList.toggle("show");
 }
@@ -32,6 +35,7 @@ function Preparar(tipo) {
         document.getElementById('Palavras').classList.remove('display');
         document.getElementById('Pontuacao').classList.remove('display');
     }
+    setInterval(updateCountdown, 1000);
     let container = document.getElementById('Contentor');
     let tbl = document.createElement('table');
     let taken = [];
@@ -51,7 +55,7 @@ function Preparar(tipo) {
             }
             container.appendChild(tbl); 
 
-            for(let p of document.querySelectorAll("p")){
+            for(let p of document.querySelectorAll('p')){
                 if(taken.length === 2){
                     break;
                 }
@@ -61,6 +65,7 @@ function Preparar(tipo) {
                 }
                 taken.push(PalavrasF[n]);
                 p.textContent = PalavrasF[n];
+                p.className = PalavrasF[n];
             } 
             break
 
@@ -75,7 +80,7 @@ function Preparar(tipo) {
             }
             container.appendChild(tbl); 
 
-            for(let p of document.querySelectorAll("p")){
+            for(let p of document.querySelectorAll('p')){
                 if(taken.length === 4){
                     break;
                 }
@@ -85,6 +90,7 @@ function Preparar(tipo) {
                 }
                 taken.push(PalavrasN[n]);
                 p.textContent = PalavrasN[n];
+                p.className = PalavrasN[n];
             }
             break;
 
@@ -99,7 +105,7 @@ function Preparar(tipo) {
             }
             container.appendChild(tbl); 
 
-            for(let p of document.querySelectorAll("p")){
+            for(let p of document.querySelectorAll('p')){
                 if(taken.length === 5){
                     break;
                 }
@@ -109,6 +115,7 @@ function Preparar(tipo) {
                 }
                 taken.push(PalavrasD[n]);
                 p.textContent = PalavrasD[n];
+                p.className = PalavrasD[n];
             }
             break;
         
@@ -131,7 +138,7 @@ function Preparar(tipo) {
                     startCell = SstartCell.split("cell")[1];
                     startRow = Math.floor(startCell/10);
                     startCol = startCell%10;
-                }else if(endCell === undefined){
+                }else if(endCell === undefined){  
                     endCell = node.id;
                     SendCell = String(endCell);
                     endCell = SendCell.split("cell")[1];
@@ -140,6 +147,7 @@ function Preparar(tipo) {
                     array = generatingsthecorrectagins(startRow, startCol, endRow, endCol); 
                     console.log(array);
                     if(taken.includes(array[1])){
+                        document.querySelector(`.${array[1]}`).classList.add('risca');
                         console.log("ENTREI");
                         mudatingcoloratings(startRow, startCol, array, true);
                         nCorreta++;
@@ -268,7 +276,7 @@ function displayWords(taken, tipo) {
                 break;
             
             case 1:
-                random = Math.floor(Math.random() * 8) + 1;
+                random = Math.floor(Math.random() * 4) + 1;
                 startRow = Math.floor(Math.random() * 9);
                 startCol = Math.floor(Math.random() * 9);
                 testRow = startRow;
@@ -352,33 +360,7 @@ function displayWords(taken, tipo) {
                         startRow++;
                     }
                     i++;
-                    
-                }else if(random === 4){ //Vertical <-
-                    if((startRow - taken[i].length) < 0){
-                        continue;
-                    }
-                    for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
-                            continue ciclo1;
-                        }
-                        testRow--;
-                    }
-                    let end = false;
-                    let j = 0;
-                    while (!end) {
-                        if (j >= taken[i].length) {
-                            end = true;
-                            continue;
-                        }
-                        console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
-                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
-                        j++;
-                        startRow--;
-                    }
-                    i++;
-                        
-                }else if(random === 5){ //Diagonal \ v
+                }else{ //Diagonal \ v
                     if((taken[i].length + startCol) > 8 || (taken[i].length + startRow) > 8){
                         continue;
                     }
@@ -402,84 +384,6 @@ function displayWords(taken, tipo) {
                         j++;
                         startRow++;
                         startCol++;
-                    }
-                    i++;
-                }else if(random === 6){ //Diagonal \ ^
-                    if((startCol - taken[i].length) < 0 || (startRow - taken[i].length) < 0){
-                        continue;
-                    }
-                    for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
-                            continue ciclo1;
-                        }
-                        testRow--;
-                        testCol--;                
-                    }
-                    let end = false;
-                    let j = 0;
-                    while (!end) {
-                        if (j >= taken[i].length) {
-                            end = true;
-                            continue;
-                        }
-                        console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
-                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
-                        j++;
-                        startRow--;
-                        startCol--;
-                    }
-                    i++;
-                }else if(random === 7){ //Diagonal / ^
-                    if((taken[i].length + startCol) > 8 || (startRow - taken[i].length) < 0){
-                        continue;
-                    }
-                    for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
-                            continue ciclo1;
-                        }
-                        testRow--;
-                        testCol++;                
-                    }
-                    let end = false;
-                    let j = 0;
-                    while (!end) {
-                        if (j >= taken[i].length) {
-                            end = true;
-                            continue;
-                        }
-                        console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
-                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
-                        j++;
-                        startRow--;
-                        startCol++;
-                    }
-                    i++;
-                }else{ //
-                    if((taken[i].length + startRow) > 8 || (startCol - taken[i].length) < 0){
-                        continue;
-                    }
-                    for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
-                            continue ciclo1;
-                        }
-                        testRow++;
-                        testCol--;                
-                    }
-                    let end = false;
-                    let j = 0;
-                    while (!end) {
-                        if (j >= taken[i].length) {
-                            end = true;
-                            continue;
-                        }
-                        console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
-                        //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
-                        j++;
-                        startRow++;
-                        startCol--;
                     }
                     i++;
                 }
@@ -711,6 +615,7 @@ function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
     let diff;
     let palavra;
     let x = 1;
+
     if(startRow === endRow){
         if(startCol > endCol){
             diff = startCol - endCol;
@@ -850,6 +755,19 @@ function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
             }
         }
     }
+}
+
+function updateCountdown(){
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    if(minutes === 0 && seconds == 0){
+        document.getElementById("timer").classList.add('display');
+        clearInterval(setInterval(updateCountdown, 1000));
+    }
+    seconds = seconds < 3 ? '0' + seconds : seconds;
+    document.getElementById("timer").innerHTML = `${minutes}: ${seconds}`;
+    time--;
 }
 
 function mudatingcoloratings(startRow, startCol, array, contem){
