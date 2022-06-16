@@ -2,6 +2,11 @@ let PalavrasF = ["REACT", "HTML", "CSS", "LS", "JAVA"]
 let PalavrasN = ["REACT", "VARIAVEL", "FUNCAO", "PYTHON", "JAVA", "STRING"]
 let PalavrasD = ["JAVASCRIPT", "VARIAVEL", "STRING", "PYTHON", "PROGRAMAR"]
 
+let score = 0;
+let taken = [];
+let nCorreta = 0;
+let nErrada = 0;
+
 const startingMinutes = 3;
 let time = startingMinutes * 60;
 
@@ -23,7 +28,9 @@ window.onclick = function(event) {
     }
 }
 
-function update(nCorreta, nErrada){
+//cell 0 1 0 1 cell[11][10]
+
+function update(){
     document.getElementById('Certas').innerHTML = `Palavras Certas: ${nCorreta}`;
     document.getElementById('Erradas').innerHTML = `Palavras Erradas: ${nErrada}`;
 }
@@ -35,13 +42,10 @@ function Preparar(tipo) {
         document.getElementById('Palavras').classList.remove('display');
         document.getElementById('Pontuacao').classList.remove('display');
     }
-    setInterval(updateCountdown, 1000);
     let container = document.getElementById('Contentor');
     let tbl = document.createElement('table');
-    let taken = [];
-    let nCorreta = 0;
-    let nErrada = 0;
-    update(nCorreta, nErrada);
+    update();
+    setInterval(updateCountdown, 1000);
     
     switch(tipo){
         case 0:
@@ -60,14 +64,14 @@ function Preparar(tipo) {
                     break;
                 }
                 let n = Math.floor(Math.random() * 5);
-                while(taken.includes(PalavrasN[n])){
+                while(taken.includes(PalavrasF[n])){
                     n = Math.floor(Math.random() * 5);
                 }
                 taken.push(PalavrasF[n]);
                 p.textContent = PalavrasF[n];
                 p.className = PalavrasF[n];
             } 
-            break
+            break;
 
         case 1: 
             for (let i = 0; i < 9; i++) {
@@ -124,7 +128,7 @@ function Preparar(tipo) {
     }
     
     console.log(taken);
-    displayWords(taken, tipo);
+    displayWords(tipo);
     let array = [];
     let startCell, endCell, SstartCell, SendCell;
     let startRow, startCol, endRow, endCol;
@@ -150,13 +154,18 @@ function Preparar(tipo) {
                         document.querySelector(`.${array[1]}`).classList.add('risca');
                         console.log("ENTREI");
                         mudatingcoloratings(startRow, startCol, array, true);
+                        pontuacao(true, tipo);
                         nCorreta++;
-                        update(nCorreta, nErrada);
+                        update();
+                        checkEnd();
+                        console.log(score);
                     }
                     else{
                         mudatingcoloratings(startRow, startCol, array, false);
+                        pontuacao(false, tipo);
                         nErrada++;
-                        update(nCorreta, nErrada);
+                        update();
+                        console.log(score);
                     }
                     startCell = undefined;
                     endCell = undefined;
@@ -171,7 +180,7 @@ function Preparar(tipo) {
     }
 }
 
-function displayWords(taken, tipo) {
+function displayWords(tipo) {
     
     //let tipo = 1;
     let i = 0;
@@ -768,6 +777,7 @@ function updateCountdown(){
     seconds = seconds < 3 ? '0' + seconds : seconds;
     document.getElementById("timer").innerHTML = `${minutes}: ${seconds}`;
     time--;
+    checkEnd();
 }
 
 function mudatingcoloratings(startRow, startCol, array, contem){
@@ -909,3 +919,39 @@ function mudatingcoloratings(startRow, startCol, array, contem){
     }
 }
 
+function pontuacao(x, tipo){
+    switch(tipo){
+        case 0:
+            if(x === true){
+                score += 10 * 0.5;
+            }else{
+                score -= 5 * 0.5;
+            } 
+         break;
+        
+        case 1: 
+            if(x === true){
+                score += 10 * 1;
+            }else{
+                score -= 5 * 1;
+            }
+         break;
+
+        case 2: 
+            if(x === true){
+                score += 10 * 1.5;
+            }else{
+                score -= 5 * 1.5;
+            }
+            break;
+    }
+}
+
+function checkEnd(){
+    if(document.getElementById('timer').innerHTML === "0:00" || taken.length === nCorreta){
+        clearInterval(setInterval(updateCountdown, 1000));
+        document.getElementById('timer').innerHTML = `Score: ${score}`;
+        document.getElementById('Palavras').classList.add('display');
+        document.querySelector('table').classList.add('display');
+    }
+}
