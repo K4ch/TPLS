@@ -1,11 +1,12 @@
-let PalavrasF = ["REACT", "HTML", "CSS", "LS", "JAVA"] 
-let PalavrasN = ["REACT", "VARIAVEL", "FUNCAO", "PYTHON", "JAVA", "STRING"]
-let PalavrasD = ["JAVASCRIPT", "VARIAVEL", "STRING", "PYTHON", "PROGRAMAR"]
+const PalavrasF = ["REACT", "HTML", "CSS", "LS", "JAVA"] 
+const PalavrasN = ["REACT", "VARIAVEL", "FUNCAO", "PYTHON", "JAVA", "STRING"]
+const PalavrasD = ["JAVASCRIPT", "VARIAVEL", "STRING", "PYTHON", "PROGRAMAR"]
 
 let score = 0;
 let taken = [];
 let nCorreta = 0;
 let nErrada = 0;
+let saveInterval;
 
 const startingMinutes = 3;
 let time = startingMinutes * 60;
@@ -28,15 +29,20 @@ window.onclick = function(event) {
     }
 }
 
-//cell 0 1 0 1 cell[11][10]
-
 function update(){
     document.getElementById('Certas').innerHTML = `Palavras Certas: ${nCorreta}`;
     document.getElementById('Erradas').innerHTML = `Palavras Erradas: ${nErrada}`;
 }
 
+function refresh(){
+    setTimeout(() => {
+        console.log("refreshing");
+        window.location.reload();
+    });
+}
+
 function Preparar(tipo) {
-    
+
     if(tipo == 0 || tipo == 1 || tipo == 2 ){
         document.getElementById('botaoDisplay').classList.add('display');
         document.getElementById('Palavras').classList.remove('display');
@@ -45,7 +51,7 @@ function Preparar(tipo) {
     let container = document.getElementById('Contentor');
     let tbl = document.createElement('table');
     update();
-    setInterval(updateCountdown, 1000);
+    saveInterval = setInterval(updateCountdown, 1000);
     
     switch(tipo){
         case 0:
@@ -54,7 +60,7 @@ function Preparar(tipo) {
                 for (let j = 0; j < 6; j++) {
                     let td = tr.insertCell();
                         td.appendChild(document.createTextNode('X'));
-                    td.setAttribute('id', `cell${i}${j}`);
+                    td.setAttribute('id', `cell[${i}][${j}]`);
                 }
             }
             container.appendChild(tbl); 
@@ -79,7 +85,7 @@ function Preparar(tipo) {
                 for (let j = 0; j < 9; j++) {
                     let td = tr.insertCell();
                         td.appendChild(document.createTextNode('X'));
-                    td.setAttribute('id', `cell${i}${j}`);
+                    td.setAttribute('id', `cell[${i}][${j}]`);
                 }
             }
             container.appendChild(tbl); 
@@ -104,7 +110,7 @@ function Preparar(tipo) {
                 for (let j = 0; j < 12; j++) {
                     let td = tr.insertCell();
                         td.appendChild(document.createTextNode('X'));
-                    td.setAttribute('id', `cell${i}${j}`);
+                    td.setAttribute('id', `cell[${i}][${j}]`);
                 }
             }
             container.appendChild(tbl); 
@@ -133,27 +139,32 @@ function Preparar(tipo) {
     let startCell, endCell, SstartCell, SendCell;
     let startRow, startCol, endRow, endCol;
     for (let node of document.querySelectorAll("td")) {
-        node.onclick = function cliqueitings(){
+        node.onclick = function handleClicks(){
             if(node.className == ""){
                 node.className = "Selecionado"
                 if(startCell === undefined){ 
                     startCell = node.id;
                     SstartCell = String(startCell);
                     startCell = SstartCell.split("cell")[1];
-                    startRow = Math.floor(startCell/10);
-                    startCol = startCell%10;
+                    console.log(startCell);
+                    startRow = parseInt(startCell.match(/(?<=\[).+?(?=\])/g)[0]);
+                    console.log("startRow: "+ startRow);
+                    startCol = parseInt(startCell.match(/(?<=\[).+?(?=\])/g)[1]);
+                    console.log("startCol: "+ startCol);
                 }else if(endCell === undefined){  
                     endCell = node.id;
                     SendCell = String(endCell);
                     endCell = SendCell.split("cell")[1];
-                    endRow = Math.floor(endCell/10);
-                    endCol = endCell%10;
-                    array = generatingsthecorrectagins(startRow, startCol, endRow, endCol); 
+                    console.log(endCell);
+                    endRow = parseInt(endCell.match(/(?<=\[).+?(?=\])/g)[0])
+                    console.log("endRow: "+ endRow);
+                    endCol = parseInt(endCell.match(/(?<=\[).+?(?=\])/g)[1]);
+                    console.log("endCol: "+ endCol);
+                    array = getWordAndPos(startRow, startCol, endRow, endCol); 
                     console.log(array);
                     if(taken.includes(array[1])){
                         document.querySelector(`.${array[1]}`).classList.add('risca');
-                        console.log("ENTREI");
-                        mudatingcoloratings(startRow, startCol, array, true);
+                        displayColor(startRow, startCol, array, true);
                         pontuacao(true, tipo);
                         nCorreta++;
                         update();
@@ -161,7 +172,7 @@ function Preparar(tipo) {
                         console.log(score);
                     }
                     else{
-                        mudatingcoloratings(startRow, startCol, array, false);
+                        displayColor(startRow, startCol, array, false);
                         pontuacao(false, tipo);
                         nErrada++;
                         update();
@@ -207,7 +218,7 @@ function displayWords(tipo) {
                         continue;
                    }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testCol++;
@@ -223,7 +234,7 @@ function displayWords(tipo) {
                         }
                         
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startCol++;
@@ -235,7 +246,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${startCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${startCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow++;
@@ -248,7 +259,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow++;
@@ -260,7 +271,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow++;
@@ -274,7 +285,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow++;
@@ -296,7 +307,7 @@ function displayWords(tipo) {
                         continue;
                    }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testCol++;
@@ -312,7 +323,7 @@ function displayWords(tipo) {
                         }
                         
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startCol++;
@@ -324,7 +335,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testCol--;
@@ -337,7 +348,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startCol--;
@@ -350,7 +361,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${startCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${startCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow++;
@@ -363,7 +374,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow++;
@@ -374,7 +385,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow++;
@@ -388,7 +399,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow++;
@@ -411,7 +422,7 @@ function displayWords(tipo) {
                         continue;
                    }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testCol++;
@@ -427,7 +438,7 @@ function displayWords(tipo) {
                         }
                         
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startCol++;
@@ -438,7 +449,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${startRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${startRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${startRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testCol--;
@@ -451,7 +462,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startCol--;
@@ -464,7 +475,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${startCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${startCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow++;
@@ -477,7 +488,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow++;
@@ -489,7 +500,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${startCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${startCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${startCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${startCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow--;
@@ -502,7 +513,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow--;
@@ -514,7 +525,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow++;
@@ -528,7 +539,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow++;
@@ -540,7 +551,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow--;
@@ -554,7 +565,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow--;
@@ -566,7 +577,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow--;
@@ -580,7 +591,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow--;
@@ -592,7 +603,7 @@ function displayWords(tipo) {
                         continue;
                     }
                     for(let k = 0; k < taken[i].length; k++){
-                        if(document.getElementById(`cell${testRow}${testCol}`).textContent !== 'X' && document.getElementById(`cell${testRow}${testCol}`).textContent !== taken[i].charAt(k)){
+                        if(document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== 'X' && document.getElementById(`cell[${testRow}][${testCol}]`).textContent !== taken[i].charAt(k)){
                             continue ciclo1;
                         }
                         testRow++;
@@ -606,7 +617,7 @@ function displayWords(tipo) {
                             continue;
                         }
                         console.log(taken[i].charAt(j));
-                        document.getElementById(`cell${startRow}${startCol}`).innerHTML = taken[i].charAt(j);
+                        document.getElementById(`cell[${startRow}][${startCol}]`).innerHTML = taken[i].charAt(j);
                         //document.getElementById(`cell${startRow}${startCol}`).style.backgroundColor = "red";
                         j++;
                         startRow++;
@@ -620,7 +631,7 @@ function displayWords(tipo) {
     }
 }
 
-function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
+function getWordAndPos(startRow, startCol, endRow, endCol){
     let diff;
     let palavra;
     let x = 1;
@@ -628,30 +639,30 @@ function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
     if(startRow === endRow){
         if(startCol > endCol){
             diff = startCol - endCol;
-            palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+            palavra = document.getElementById(`cell[${startRow}][${startCol}]`).textContent;
             for(i = diff; i > 0; i--){
-                if(document.getElementById(`cell${startRow}${startCol-x}`).className === "plvCorreta"){
-                    palavra += document.getElementById(`cell${startRow}${startCol-x}`).textContent;
+                if(document.getElementById(`cell[${startRow}][${startCol-x}]`).className === "plvCorreta"){
+                    palavra += document.getElementById(`cell[${startRow}][${startCol-x}]`).textContent;
                     x++;
                     continue;
                 }
-                palavra += document.getElementById(`cell${startRow}${startCol-x}`).textContent;
-                document.getElementById(`cell${startRow}${startCol-x}`).className = "Selecionado"
+                palavra += document.getElementById(`cell[${startRow}][${startCol-x}]`).textContent;
+                document.getElementById(`cell[${startRow}][${startCol-x}]`).className = "Selecionado"
                 x++;
             }
             console.log(palavra);
             return [2, palavra];
         }else if(startCol < endCol){
             diff = endCol - startCol;
-            palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+            palavra = document.getElementById(`cell[${startRow}][${startCol}]`).textContent;
             for(i = diff; i > 0; i--){
-                if(document.getElementById(`cell${startRow}${startCol+x}`).className === "plvCorreta"){
-                    palavra += document.getElementById(`cell${startRow}${startCol+x}`).textContent;
+                if(document.getElementById(`cell[${startRow}][${startCol+x}]`).className === "plvCorreta"){
+                    palavra += document.getElementById(`cell[${startRow}][${startCol+x}]`).textContent;
                     x++;
                     continue;
                 }
-                palavra += document.getElementById(`cell${startRow}${startCol+x}`).textContent;
-                document.getElementById(`cell${startRow}${startCol+x}`).className = "Selecionado"
+                palavra += document.getElementById(`cell[${startRow}][${startCol+x}]`).textContent;
+                document.getElementById(`cell[${startRow}][${startCol+x}]`).className = "Selecionado"
                 x++;
             }
             console.log(palavra);
@@ -660,30 +671,30 @@ function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
     }else if(startCol === endCol){
         if(startRow < endRow){
             diff = endRow - startRow;
-            palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+            palavra = document.getElementById(`cell[${startRow}][${startCol}]`).textContent;
             for(i = diff; i > 0; i--){
-                if(document.getElementById(`cell${startRow+x}${startCol}`).className === "plvCorreta"){
-                    palavra += document.getElementById(`cell${startRow+x}${startCol}`).textContent;
+                if(document.getElementById(`cell[${startRow+x}][${startCol}]`).className === "plvCorreta"){
+                    palavra += document.getElementById(`cell[${startRow+x}][${startCol}]`).textContent;
                     x++;
                     continue;
                 }
-                palavra += document.getElementById(`cell${startRow+x}${startCol}`).textContent;
-                document.getElementById(`cell${startRow+x}${startCol}`).className = "Selecionado"
+                palavra += document.getElementById(`cell[${startRow+x}][${startCol}]`).textContent;
+                document.getElementById(`cell[${startRow+x}][${startCol}]`).className = "Selecionado"
                 x++;
             }
             console.log(palavra);
             return [3, palavra];
         }else if(startRow > endRow){
             diff = startRow - endRow;
-            palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+            palavra = document.getElementById(`cell[${startRow}][${startCol}]`).textContent;
             for(i = diff; i > 0; i--){
-                if(document.getElementById(`cell${startRow-x}${startCol}`).className === "plvCorreta"){
-                    palavra += document.getElementById(`cell${startRow-x}${startCol}`).textContent;
+                if(document.getElementById(`cell[${startRow-x}][${startCol}]`).className === "plvCorreta"){
+                    palavra += document.getElementById(`cell[${startRow-x}][${startCol}]`).textContent;
                     x++;
                     continue;
                 }
-                palavra += document.getElementById(`cell${startRow-x}${startCol}`).textContent;
-                document.getElementById(`cell${startRow-x}${startCol}`).className = "Selecionado"
+                palavra += document.getElementById(`cell[${startRow-x}][${startCol}]`).textContent;
+                document.getElementById(`cell[${startRow-x}][${startCol}]`).className = "Selecionado"
                 x++;
             }
             console.log(palavra);
@@ -694,15 +705,15 @@ function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
             if(startRow < endRow){
                 if((startCol-endCol) === (endRow-startRow)){
                     diff = startCol - endCol;
-                    palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+                    palavra = document.getElementById(`cell[${startRow}][${startCol}]`).textContent;
                     for(i = diff; i > 0; i--){
-                        if(document.getElementById(`cell${startRow+x}${startCol-x}`).className === "plvCorreta"){
-                            palavra += document.getElementById(`cell${startRow+x}${startCol-x}`).textContent;
+                        if(document.getElementById(`cell[${startRow+x}][${startCol-x}]`).className === "plvCorreta"){
+                            palavra += document.getElementById(`cell[${startRow+x}][${startCol-x}]`).textContent;
                             x++;
                             continue;
                         }
-                        palavra += document.getElementById(`cell${startRow+x}${startCol-x}`).textContent;
-                        document.getElementById(`cell${startRow+x}${startCol-x}`).className = "Selecionado"
+                        palavra += document.getElementById(`cell[${startRow+x}][${startCol-x}]`).textContent;
+                        document.getElementById(`cell[${startRow+x}][${startCol-x}]`).className = "Selecionado"
                         x++;
                     }
                     console.log(palavra);
@@ -711,15 +722,15 @@ function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
             }else if(startRow > endRow){
                 if((startCol-endCol) === (startRow-endRow)){
                     diff = startCol - endCol;
-                    palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+                    palavra = document.getElementById(`cell[${startRow}][${startCol}]`).textContent;
                     for(i = diff; i > 0; i--){
-                        if(document.getElementById(`cell${startRow-x}${startCol-x}`).className === "plvCorreta"){
-                            palavra += document.getElementById(`cell${startRow-x}${startCol-x}`).textContent;
+                        if(document.getElementById(`cell[${startRow-x}][${startCol-x}]`).className === "plvCorreta"){
+                            palavra += document.getElementById(`cell[${startRow-x}][${startCol-x}]`).textContent;
                             x++;
                             continue;
                         }
-                        palavra += document.getElementById(`cell${startRow-x}${startCol-x}`).textContent;
-                        document.getElementById(`cell${startRow-x}${startCol-x}`).className = "Selecionado"
+                        palavra += document.getElementById(`cell[${startRow-x}][${startCol-x}]`).textContent;
+                        document.getElementById(`cell[${startRow-x}][${startCol-x}]`).className = "Selecionado"
                         x++;
                     }
                     console.log(palavra);
@@ -730,15 +741,15 @@ function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
             if(startRow < endRow){
                 if((endCol-startCol) === (endRow-startRow)){
                     diff = endCol - startCol;
-                    palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+                    palavra = document.getElementById(`cell[${startRow}][${startCol}]`).textContent;
                     for(i = diff; i > 0; i--){
-                        if(document.getElementById(`cell${startRow+x}${startCol+x}`).className === "plvCorreta"){
-                            palavra += document.getElementById(`cell${startRow+x}${startCol+x}`).textContent;
+                        if(document.getElementById(`cell[${startRow+x}][${startCol+x}]`).className === "plvCorreta"){
+                            palavra += document.getElementById(`cell[${startRow+x}][${startCol+x}]`).textContent;
                             x++;
                             continue;
                         }
-                        palavra += document.getElementById(`cell${startRow+x}${startCol+x}`).textContent;
-                        document.getElementById(`cell${startRow+x}${startCol+x}`).className = "Selecionado"
+                        palavra += document.getElementById(`cell[${startRow+x}][${startCol+x}]`).textContent;
+                        document.getElementById(`cell[${startRow+x}][${startCol+x}]`).className = "Selecionado"
                         x++;
                     }
                     console.log(palavra);
@@ -747,15 +758,15 @@ function generatingsthecorrectagins(startRow, startCol, endRow, endCol){
             }else if(startRow > endRow){
                 if((endCol-startCol) === (startRow-endRow)){
                     diff = startCol - endCol;
-                    palavra = document.getElementById(`cell${startRow}${startCol}`).textContent;
+                    palavra = document.getElementById(`cell[${startRow}][${startCol}]`).textContent;
                     for(i = diff; i > 0; i--){
-                        if(document.getElementById(`cell${startRow-x}${startCol+x}`).className === "plvCorreta"){
-                            palavra += document.getElementById(`cell${startRow-x}${startCol+x}`).textContent;
+                        if(document.getElementById(`cell[${startRow-x}][${startCol+x}]`).className === "plvCorreta"){
+                            palavra += document.getElementById(`cell[${startRow-x}][${startCol+x}]`).textContent;
                             x++;
                             continue;
                         }
-                        palavra += document.getElementById(`cell${startRow-x}${startCol+x}`).textContent;
-                        document.getElementById(`cell${startRow-x}${startCol+x}`).className = "Selecionado"
+                        palavra += document.getElementById(`cell[${startRow-x}][${startCol+x}]`).textContent;
+                        document.getElementById(`cell[${startRow-x}][${startCol+x}]`).className = "Selecionado"
                         x++;
                     }
                     console.log(palavra);
@@ -770,9 +781,9 @@ function updateCountdown(){
     let minutes = Math.floor(time / 60);
     let seconds = time % 60;
 
-    if(minutes === 0 && seconds == 0){
-        document.getElementById("timer").classList.add('display');
-        clearInterval(setInterval(updateCountdown, 1000));
+    if(minutes === 0 && seconds === 0){
+        clearInterval(saveInterval);
+        checkEnd();
     }
     seconds = seconds < 3 ? '0' + seconds : seconds;
     document.getElementById("timer").innerHTML = `${minutes}: ${seconds}`;
@@ -780,21 +791,21 @@ function updateCountdown(){
     checkEnd();
 }
 
-function mudatingcoloratings(startRow, startCol, array, contem){
+function displayColor(startRow, startCol, array, contem){
     let posicao = array[0];
     let palavra = array[1];
     switch(posicao){
         case 1: {
             for(let i = palavra.length-1; i >= 0;i--){
                 if(contem === true){
-                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    document.getElementById(`cell[${startRow}][${startCol}]`).className = "plvCorreta";
                     startCol++;
                 }else{
-                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                    if(document.getElementById(`cell[${startRow}][${startCol}]`).className === "plvCorreta"){
                         startCol++;
                         continue;
                     }
-                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    document.getElementById(`cell[${startRow}][${startCol}]`).classList.remove("Selecionado");
                     startCol++;
                 }
             }
@@ -802,14 +813,14 @@ function mudatingcoloratings(startRow, startCol, array, contem){
         case 2: {
             for(let i = palavra.length-1; i >= 0;i--){
                 if(contem === true){
-                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    document.getElementById(`cell[${startRow}][${startCol}]`).className = "plvCorreta";
                     startCol--;
                 }else{
-                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                    if(document.getElementById(`cell[${startRow}][${startCol}]`).className === "plvCorreta"){
                         startCol--;
                         continue;
                     }
-                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    document.getElementById(`cell[${startRow}][${startCol}]`).classList.remove("Selecionado");
                     startCol--;
                 }
             }
@@ -817,14 +828,14 @@ function mudatingcoloratings(startRow, startCol, array, contem){
         case 3: {
             for(let i = palavra.length-1; i >= 0;i--){
                 if(contem === true){
-                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    document.getElementById(`cell[${startRow}][${startCol}]`).className = "plvCorreta";
                     startRow++;
                 }else{
-                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                    if(document.getElementById(`cell[${startRow}][${startCol}]`).className === "plvCorreta"){
                         startRow++;
                         continue;
                     }
-                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    document.getElementById(`cell[${startRow}][${startCol}]`).classList.remove("Selecionado");
                     startRow++;
                 }
             }
@@ -832,14 +843,14 @@ function mudatingcoloratings(startRow, startCol, array, contem){
         case 4: {
             for(let i = palavra.length-1; i >= 0;i--){
                 if(contem === true){
-                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    document.getElementById(`cell[${startRow}][${startCol}]`).className = "plvCorreta";
                     startRow--;
                 }else{
-                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                    if(document.getElementById(`cell[${startRow}][${startCol}]`).className === "plvCorreta"){
                         startRow--;
                         continue;
                     }
-                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    document.getElementById(`cell[${startRow}][${startCol}]`).classList.remove("Selecionado");
                     startRow--;
                 }
             }
@@ -847,16 +858,16 @@ function mudatingcoloratings(startRow, startCol, array, contem){
         case 5: {
             for(let i = palavra.length-1; i >= 0;i--){
                 if(contem === true){
-                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    document.getElementById(`cell[${startRow}][${startCol}]`).className = "plvCorreta";
                     startRow++;
                     startCol++;
                 }else{
-                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                    if(document.getElementById(`cell[${startRow}][${startCol}]`).className === "plvCorreta"){
                         startRow++;
                         startCol++;
                         continue;
                     }
-                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    document.getElementById(`cell[${startRow}][${startCol}]`).classList.remove("Selecionado");
                     startRow++;
                     startCol++;
                 }
@@ -865,16 +876,16 @@ function mudatingcoloratings(startRow, startCol, array, contem){
         case 6: {
             for(let i = palavra.length-1; i >= 0;i--){
                 if(contem === true){
-                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    document.getElementById(`cell[${startRow}][${startCol}]`).className = "plvCorreta";
                     startRow--;
                     startCol--;
                 }else{
-                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                    if(document.getElementById(`cell[${startRow}][${startCol}]`).className === "plvCorreta"){
                         startRow--;
                         startCol--;
                         continue;
                     }
-                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    document.getElementById(`cell[${startRow}][${startCol}]`).classList.remove("Selecionado");
                     startRow--;
                     startCol--;
                 }
@@ -883,16 +894,16 @@ function mudatingcoloratings(startRow, startCol, array, contem){
         case 7: {
             for(let i = palavra.length-1; i >= 0;i--){
                 if(contem === true){
-                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    document.getElementById(`cell[${startRow}][${startCol}]`).className = "plvCorreta";
                     startRow--;
                     startCol++;
                 }else{
-                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                    if(document.getElementById(`cell[${startRow}][${startCol}]`).className === "plvCorreta"){
                         startRow--;
                         startCol++;
                         continue;
                     }
-                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    document.getElementById(`cell[${startRow}][${startCol}]`).classList.remove("Selecionado");
                     startRow--;
                     startCol++;
                 }
@@ -901,16 +912,16 @@ function mudatingcoloratings(startRow, startCol, array, contem){
         case 8: {
             for(let i = palavra.length-1; i >= 0;i--){
                 if(contem === true){
-                    document.getElementById(`cell${startRow}${startCol}`).className = "plvCorreta";
+                    document.getElementById(`cell[${startRow}][${startCol}]`).className = "plvCorreta";
                     startRow++;
                     startCol--;
                 }else{
-                    if(document.getElementById(`cell${startRow}${startCol}`).className === "plvCorreta"){
+                    if(document.getElementById(`cell[${startRow}][${startCol}]`).className === "plvCorreta"){
                         startRow++;
                         startCol--;
                         continue;
                     }
-                    document.getElementById(`cell${startRow}${startCol}`).classList.remove("Selecionado");
+                    document.getElementById(`cell[${startRow}][${startCol}]`).classList.remove("Selecionado");
                     startRow++;
                     startCol--;
                 }
@@ -948,10 +959,11 @@ function pontuacao(x, tipo){
 }
 
 function checkEnd(){
-    if(document.getElementById('timer').innerHTML === "0:00" || taken.length === nCorreta){
-        clearInterval(setInterval(updateCountdown, 1000));
+    if(document.getElementById('timer').innerHTML === "0: 00"  || taken.length === nCorreta){
+        clearInterval(saveInterval);
         document.getElementById('timer').innerHTML = `Score: ${score}`;
         document.getElementById('Palavras').classList.add('display');
         document.querySelector('table').classList.add('display');
+        document.getElementById('refresh').style.visibility = "visible";
     }
 }

@@ -131,3 +131,13 @@ td.plvErrada{
   
 
 .show {display:block;}
+
+#refresh{
+    position: relative;
+    display: inline-block;
+    margin-left: 690px;
+    font-size: 15px;
+    height: 60px;
+    background-color: rgb(77, 103, 50);
+    visibility: hidden;
+}
